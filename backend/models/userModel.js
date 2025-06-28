@@ -59,8 +59,30 @@ userScema.statics.signup = async function (firstName, lastName, email, password)
      // create user
      const user = await this.create({ firstName, lastName, email, password: hash })
      return user;
-     
 
 };
+
+// static login method
+userScema.statics.login = async function (email, password) {
+    // validation
+    if (!email || !password) {
+        throw Error('All fields must be filled');
+    }
+
+    // check if user exists
+    const user = await this.findOne({ email });
+    if (!user) {
+        throw Error('Incorrect email or password');
+    }
+
+    // compare password
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+        throw Error('Incorrect email or password');
+    }
+
+    return user;
+}
+
 
 module.exports = mongoose.model('User', userScema);
